@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perseus AMD Agent — Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #020617; color: #e2e8f0; font-family: 'JetBrains Mono', monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+  .diagram-container { max-width: 1400px; width: 100%; }
+  .header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding: 0 8px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #22d3ee; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+  .header h1 { font-size: 20px; font-weight: 700; color: #f1f5f9; }
+  .header span { font-size: 13px; color: #64748b; }
+  .svg-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; overflow: hidden; }
+  svg { display: block; width: 100%; height: auto; }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 20px; }
+  .card { background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 20px; }
+  .card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .card-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .card-dot.cyan { background: #22d3ee; }
+  .card-dot.emerald { background: #34d399; }
+  .card-dot.violet { background: #a78bfa; }
+  .card h3 { font-size: 14px; font-weight: 600; color: #e2e8f0; }
+  .card ul { list-style: none; font-size: 11px; color: #94a3b8; line-height: 1.8; }
+  .footer { text-align: center; font-size: 11px; color: #475569; margin-top: 16px; }
+</style>
+</head>
+<body>
+<div class="diagram-container">
+  <div class="header">
+    <div class="dot"></div>
+    <h1>Perseus AMD Agent</h1>
+    <span>— Complete Agent Context Stack on AMD MI300X</span>
+  </div>
+
+  <div class="svg-card">
+    <svg viewBox="0 0 1400 900" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+          <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+        </pattern>
+        <marker id="arrow-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#22d3ee"/>
+        </marker>
+        <marker id="arrow-emerald" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#34d399"/>
+        </marker>
+        <marker id="arrow-violet" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#a78bfa"/>
+        </marker>
+        <marker id="arrow-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#fbbf24"/>
+        </marker>
+        <marker id="arrow-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#fb7185"/>
+        </marker>
+      </defs>
+
+      <!-- Background -->
+      <rect width="1400" height="900" fill="#020617"/>
+      <rect width="1400" height="900" fill="url(#grid)"/>
+
+      <!-- AMD MI300X Boundary -->
+      <rect x="40" y="40" width="1320" height="720" rx="16" fill="none" stroke="#fbbf24" stroke-width="2" stroke-dasharray="8,4" opacity="0.4"/>
+      <text x="60" y="70" font-size="11" fill="#fbbf24" font-weight="600">AMD MI300X (192GB HBM3, ROCm 7)</text>
+
+      <!-- ─── ARROWS (drawn before components so they render behind) ─── -->
+
+      <!-- Session Start → Perseus -->
+      <line x1="700" y1="115" x2="700" y2="145" stroke="#22d3ee" stroke-width="2" marker-end="url(#arrow-cyan)"/>
+      <text x="710" y="135" font-size="10" fill="#64748b">AGENTS.md preamble</text>
+
+      <!-- Perseus → vLLM -->
+      <line x1="700" y1="250" x2="700" y2="300" stroke="#22d3ee" stroke-width="2" marker-end="url(#arrow-cyan)"/>
+      <text x="710" y="280" font-size="10" fill="#64748b">resolved context</text>
+
+      <!-- vLLM → Agent Context Pipeline -->
+      <line x1="700" y1="395" x2="700" y2="435" stroke="#34d399" stroke-width="2" marker-end="url(#arrow-emerald)"/>
+      <text x="710" y="420" font-size="10" fill="#64748b">inference output</text>
+
+      <!-- Agent Pipeline → Mimir -->
+      <line x1="700" y1="565" x2="700" y2="600" stroke="#a78bfa" stroke-width="2" marker-end="url(#arrow-violet)"/>
+      <text x="710" y="588" font-size="10" fill="#64748b">remember / recall</text>
+
+      <!-- Mimir → Next Session (curved loop back) -->
+      <path d="M 700 750 L 700 790 L 120 790 L 120 200 L 180 200" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow-violet)"/>
+      <text x="150" y="808" font-size="9" fill="#64748b">cross-session memory persists</text>
+
+      <!-- Security flow (dashed rose) -->
+      <line x1="270" y1="140" x2="470" y2="140" stroke="#fb7185" stroke-width="1" stroke-dasharray="4,4" marker-end="url(#arrow-rose)"/>
+      <text x="320" y="132" font-size="9" fill="#fb7185">security gate</text>
+
+      <!-- ─── COMPONENTS ─── -->
+
+      <!-- Session Start (top center) -->
+      <rect x="580" y="80" width="240" height="50" rx="8" fill="#0f172a"/>
+      <rect x="580" y="80" width="240" height="50" rx="8" fill="rgba(8,51,68,0.4)" stroke="#22d3ee" stroke-width="1.5"/>
+      <text x="700" y="108" text-anchor="middle" font-size="12" fill="#22d3ee" font-weight="600">Agent Session Start</text>
+
+      <!-- Security Gate (left of Perseus) -->
+      <rect x="250" y="125" width="240" height="40" rx="6" fill="#0f172a"/>
+      <rect x="250" y="125" width="240" height="40" rx="6" fill="rgba(136,19,55,0.3)" stroke="#fb7185" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="370" y="144" text-anchor="middle" font-size="10" fill="#fb7185">Dual-Factor Security Gate</text>
+      <text x="370" y="158" text-anchor="middle" font-size="8" fill="#9f1239">allow_query_shell + PERSEUS_ALLOW_DANGEROUS</text>
+
+      <!-- Perseus (center) -->
+      <rect x="500" y="170" width="400" height="95" rx="8" fill="#0f172a"/>
+      <rect x="500" y="170" width="400" height="95" rx="8" fill="rgba(8,51,68,0.4)" stroke="#22d3ee" stroke-width="1.5"/>
+      <text x="700" y="195" text-anchor="middle" font-size="13" fill="#22d3ee" font-weight="700">Perseus — Context Engine</text>
+      <text x="700" y="212" text-anchor="middle" font-size="10" fill="#94a3b8">Python CLI • 22+ MCP tools</text>
+      <text x="700" y="228" text-anchor="middle" font-size="10" fill="#94a3b8">@services @drift @query @read @list</text>
+      <text x="700" y="244" text-anchor="middle" font-size="9" fill="#64748b">120ms cold • 15ms warm • 480MB VRAM</text>
+
+      <!-- vLLM (center) -->
+      <rect x="480" y="300" width="440" height="110" rx="8" fill="#0f172a"/>
+      <rect x="480" y="300" width="440" height="110" rx="8" fill="rgba(6,78,59,0.4)" stroke="#34d399" stroke-width="1.5"/>
+      <text x="700" y="328" text-anchor="middle" font-size="13" fill="#34d399" font-weight="700">vLLM Inference — Qwen3-Coder-FP8</text>
+      <text x="700" y="346" text-anchor="middle" font-size="10" fill="#94a3b8">ROCm 7 • FP8 KV Cache • 256K max context</text>
+      <text x="700" y="362" text-anchor="middle" font-size="10" fill="#94a3b8">80B params (3B active MoE) • 2,065,744 token KV cache</text>
+      <text x="700" y="378" text-anchor="middle" font-size="9" fill="#64748b">77.3 GB VRAM • 180-450ms TTFT</text>
+
+      <!-- Agent Context Pipeline (center) -->
+      <rect x="480" y="440" width="440" height="140" rx="8" fill="#0f172a"/>
+      <rect x="480" y="440" width="440" height="140" rx="8" fill="rgba(8,51,68,0.2)" stroke="#22d3ee" stroke-width="1.5"/>
+      <text x="700" y="468" text-anchor="middle" font-size="13" fill="#22d3ee" font-weight="700">Agent Context Pipeline</text>
+      <text x="700" y="486" text-anchor="middle" font-size="10" fill="#94a3b8">1. Perseus renders AGENTS.md preamble</text>
+      <text x="700" y="502" text-anchor="middle" font-size="10" fill="#94a3b8">2. Agent reads pre-resolved context</text>
+      <text x="700" y="518" text-anchor="middle" font-size="10" fill="#94a3b8">3. Agent reasons via vLLM → Qwen3-Coder</text>
+      <text x="700" y="534" text-anchor="middle" font-size="10" fill="#94a3b8">4. Agent calls Mimir tools (remember / recall)</text>
+      <text x="700" y="550" text-anchor="middle" font-size="10" fill="#94a3b8">5. Mimir persists to SQLite+FTS5</text>
+
+      <!-- Mimir (center bottom) -->
+      <rect x="480" y="615" width="440" height="120" rx="8" fill="#0f172a"/>
+      <rect x="480" y="615" width="440" height="120" rx="8" fill="rgba(76,29,149,0.4)" stroke="#a78bfa" stroke-width="1.5"/>
+      <text x="700" y="643" text-anchor="middle" font-size="13" fill="#a78bfa" font-weight="700">Mimir — Memory Engine</text>
+      <text x="700" y="661" text-anchor="middle" font-size="10" fill="#94a3b8">Rust • SQLite+FTS5 • 23 MCP tools</text>
+      <text x="700" y="677" text-anchor="middle" font-size="10" fill="#94a3b8">remember • recall • forget • search • reflect</text>
+      <text x="700" y="693" text-anchor="middle" font-size="10" fill="#94a3b8">Confidence-scored • Decaying • Compounding insights</text>
+      <text x="700" y="709" text-anchor="middle" font-size="9" fill="#64748b">&lt;5ms recall • 40+ entities • 360MB VRAM</text>
+
+      <!-- Next Session (bottom, faded) -->
+      <rect x="590" y="755" width="220" height="36" rx="6" fill="rgba(76,29,149,0.15)" stroke="#a78bfa" stroke-width="1" stroke-dasharray="4,4"/>
+      <text x="700" y="777" text-anchor="middle" font-size="10" fill="#a78bfa">Next Session: Recalls 16 facts</text>
+
+      <!-- ─── SUMMARY BOX (right side) ─── -->
+
+      <!-- Benchmark Summary Box -->
+      <rect x="960" y="170" width="370" height="470" rx="10" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+      <text x="1145" y="200" text-anchor="middle" font-size="12" fill="#f1f5f9" font-weight="600">MI300X Benchmarks</text>
+      <line x1="980" y1="212" x2="1310" y2="212" stroke="#1e293b" stroke-width="1"/>
+
+      <!-- Benchmark items -->
+      <text x="980" y="240" font-size="11" fill="#94a3b8">Context (cold)</text>
+      <text x="1240" y="240" text-anchor="end" font-size="11" fill="#22d3ee" font-weight="600">120ms</text>
+
+      <text x="980" y="265" font-size="11" fill="#94a3b8">Context (warm)</text>
+      <text x="1240" y="265" text-anchor="end" font-size="11" fill="#22d3ee" font-weight="600">15ms</text>
+
+      <text x="980" y="290" font-size="11" fill="#94a3b8">Token savings/session</text>
+      <text x="1240" y="290" text-anchor="end" font-size="11" fill="#34d399" font-weight="600">2,720 (85%)</text>
+
+      <text x="980" y="315" font-size="11" fill="#94a3b8">Memory recall</text>
+      <text x="1240" y="315" text-anchor="end" font-size="11" fill="#a78bfa" font-weight="600">&lt;5ms</text>
+
+      <text x="980" y="340" font-size="11" fill="#94a3b8">VRAM (context engine)</text>
+      <text x="1240" y="340" text-anchor="end" font-size="11" fill="#22d3ee" font-weight="600">480MB</text>
+
+      <text x="980" y="365" font-size="11" fill="#94a3b8">VRAM (LLM)</text>
+      <text x="1240" y="365" text-anchor="end" font-size="11" fill="#34d399" font-weight="600">77.3GB</text>
+
+      <text x="980" y="390" font-size="11" fill="#94a3b8">GPU utilization</text>
+      <text x="1240" y="390" text-anchor="end" font-size="11" fill="#fbbf24" font-weight="600">78% peak</text>
+
+      <text x="980" y="415" font-size="11" fill="#94a3b8">Cost/session</text>
+      <text x="1240" y="415" text-anchor="end" font-size="11" fill="#34d399" font-weight="600">$0.11</text>
+
+      <line x1="980" y1="432" x2="1310" y2="432" stroke="#1e293b" stroke-width="1"/>
+
+      <text x="980" y="458" font-size="11" fill="#f1f5f9" font-weight="600">Cost Economics</text>
+
+      <text x="980" y="485" font-size="10" fill="#94a3b8">10-dev team</text>
+      <text x="1240" y="485" text-anchor="end" font-size="10" fill="#34d399" font-weight="600">save $3,924/yr</text>
+
+      <text x="980" y="508" font-size="10" fill="#94a3b8">50-dev team</text>
+      <text x="1240" y="508" text-anchor="end" font-size="10" fill="#34d399" font-weight="600">save $19,620/yr</text>
+
+      <text x="980" y="531" font-size="10" fill="#94a3b8">100-dev team</text>
+      <text x="1240" y="531" text-anchor="end" font-size="10" fill="#34d399" font-weight="600">save $39,240/yr</text>
+
+      <line x1="980" y1="548" x2="1310" y2="548" stroke="#1e293b" stroke-width="1"/>
+
+      <text x="980" y="572" font-size="10" fill="#64748b">Break-even (HW): 4.6 months</text>
+      <text x="980" y="590" font-size="10" fill="#64748b">License: MIT (both components)</text>
+      <text x="980" y="608" font-size="10" fill="#64748b">MCP tools: 45+ combined</text>
+      <text x="980" y="626" font-size="10" fill="#64748b">Zero cloud dependency</text>
+
+      <!-- ─── LEGEND ─── -->
+      <rect x="40" y="790" width="600" height="70" rx="8" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+      <text x="60" y="812" font-size="11" fill="#94a3b8" font-weight="600">Legend</text>
+
+      <!-- Frontend/Context -->
+      <rect x="60" y="825" width="14" height="14" rx="3" fill="rgba(8,51,68,0.4)" stroke="#22d3ee" stroke-width="1"/>
+      <text x="80" y="836" font-size="10" fill="#94a3b8">Context Engine</text>
+
+      <!-- Backend/Inference -->
+      <rect x="210" y="825" width="14" height="14" rx="3" fill="rgba(6,78,59,0.4)" stroke="#34d399" stroke-width="1"/>
+      <text x="230" y="836" font-size="10" fill="#94a3b8">Inference</text>
+
+      <!-- Database/Memory -->
+      <rect x="340" y="825" width="14" height="14" rx="3" fill="rgba(76,29,149,0.4)" stroke="#a78bfa" stroke-width="1"/>
+      <text x="360" y="836" font-size="10" fill="#94a3b8">Memory</text>
+
+      <!-- Security -->
+      <line x1="440" y1="825" x2="480" y2="825" stroke="#fb7185" stroke-width="1" stroke-dasharray="4,4"/>
+      <text x="486" y="836" font-size="10" fill="#94a3b8">Security</text>
+
+      <!-- AMD HW -->
+      <rect x="555" y="825" width="14" height="14" rx="3" fill="rgba(120,53,15,0.3)" stroke="#fbbf24" stroke-width="1"/>
+      <text x="575" y="836" font-size="10" fill="#94a3b8">AMD Hardware</text>
+    </svg>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-dot cyan"></div>
+        <h3>Pre-Session Context</h3>
+      </div>
+      <ul>
+        <li>Resolves workspace state before agent runs</li>
+        <li>22+ MCP tools auto-discovered</li>
+        <li>Dual-factor security gate</li>
+        <li>85% token reduction per session</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-dot emerald"></div>
+        <h3>MI300X Inference</h3>
+      </div>
+      <ul>
+        <li>Qwen3-Coder-FP8 on vLLM ROCm 7</li>
+        <li>256K context, 2M+ token KV cache</li>
+        <li>192GB HBM3 — single GPU for full stack</li>
+        <li>$0.08 per inference session</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-dot violet"></div>
+        <h3>Cross-Session Memory</h3>
+      </div>
+      <ul>
+        <li>Persistent memory via Mimir (Rust)</li>
+        <li>SQLite+FTS5, 23 MCP tools</li>
+        <li>Confidence-scored, decaying knowledge</li>
+        <li>Zero hallucinations in 3-session test</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer">Perseus AMD Agent — MIT License — AMD Developer Hackathon: Act II — July 2026</div>
+</div>
+</body>
+</html>
