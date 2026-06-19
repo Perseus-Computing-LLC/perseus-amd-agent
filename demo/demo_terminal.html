@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Perseus AMD Agent — Demo</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0d1117;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px;
+  }
+  .container { width: 1100px; max-width: 100%; display: flex; flex-direction: column; gap: 20px; }
+  .terminal {
+    background: #161b22;
+    border-radius: 8px;
+    border: 1px solid #30363d;
+    overflow: hidden;
+    box-shadow: 0 0 40px rgba(88, 166, 255, 0.1);
+  }
+  .titlebar {
+    background: #21262d;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #30363d;
+  }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot.red { background: #ff5f56; }
+  .dot.yellow { background: #ffbd2e; }
+  .dot.green { background: #27c93f; }
+  .titlebar-text { color: #8b949e; font-size: 12px; margin-left: 12px; }
+  .screen {
+    height: 380px;
+    padding: 16px 20px;
+    overflow-y: auto;
+    font-size: 13px;
+    line-height: 1.6;
+    scroll-behavior: smooth;
+  }
+  .screen::-webkit-scrollbar { width: 6px; }
+  .screen::-webkit-scrollbar-track { background: #0d1117; }
+  .screen::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
+  .line { margin: 2px 0; opacity: 0; animation: fadeIn 0.3s forwards; white-space: pre-wrap; word-break: break-word; }
+  @keyframes fadeIn { to { opacity: 1; } }
+  .label { color: #8b949e; font-size: 11px; margin: 8px 0 4px; border-top: 1px solid #21262d; padding-top: 8px; }
+  .user { color: #58a6ff; }
+  .user::before { content: '▸ '; }
+  .agent { color: #3fb950; }
+  .agent::before { content: '● '; }
+  .system { color: #bc8cff; }
+  .system::before { content: '◆ '; }
+  .memory { color: #d2991d; }
+  .memory::before { content: '◈ '; }
+  .stats { color: #79c0ff; }
+  .stats::before { content: '▶ '; }
+  .badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+  .badge.store { background: #1f3a1f; color: #3fb950; }
+  .badge.recall { background: #1a2e3a; color: #58a6ff; }
+  .badge.insight { background: #2e1a3a; color: #bc8cff; }
+  .highlight { color: #f0883e; font-weight: bold; }
+  @keyframes cursor-blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  .cursor { animation: cursor-blink 0.8s infinite; }
+  .cost-table {
+    margin: 12px 0;
+    background: #0d1117;
+    border: 1px solid #21262d;
+    border-radius: 6px;
+    padding: 12px 16px;
+    overflow: hidden;
+  }
+  .cost-table h3 { color: #f1f5f9; font-size: 14px; margin-bottom: 8px; }
+  .row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px; }
+  .row .label { color: #8b949e; border: none; margin: 0; padding: 0; font-size: 12px; }
+  .row .val { font-weight: 600; }
+  .row .val.green { color: #3fb950; }
+  .row .val.cyan { color: #58a6ff; }
+  .row .val.amber { color: #d2991d; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="terminal" id="main-terminal">
+    <div class="titlebar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <span class="titlebar-text">perseus-amd-agent — demo</span>
+    </div>
+    <div class="screen" id="screen"></div>
+  </div>
+  <div class="terminal" id="benchmarks-terminal" style="display:none;">
+    <div class="titlebar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <span class="titlebar-text">MI300X Benchmarks</span>
+    </div>
+    <div class="screen" id="benchmarks-screen"></div>
+  </div>
+</div>
+
+<script>
+const screen = document.getElementById('screen');
+const benchmarksScreen = document.getElementById('benchmarks-screen');
+const benchmarksTerminal = document.getElementById('benchmarks-terminal');
+
+// ── 5-SCENE DEMO ───────────────────────────────────────────────────
+// Designed for ~155s playback (2:35)
+
+const SCENES = [
+  // ── Scene 1: The Problem (0:00-0:30) ──
+  { delay: 0, screen: 'main', lines: [
+    ['label', '── Scene 1: The Cold-Start Problem ──'],
+    ['system', 'Starting new agent session...'],
+    ['system', 'Loading context file: AGENTS.md...'],
+    ['agent', 'What stack does this project use?'],
+    ['system', 'Running: ls pyproject.toml package.json Cargo.toml...'],
+    ['system', 'Running: cat pyproject.toml...'],
+    ['system', 'Running: pip list 2>&1 | head -20...'],
+    ['agent', 'I found pyproject.toml -- this is a Python project. Let me check dependencies...'],
+    ['system', 'Running: cat requirements.txt...'],
+    ['agent', 'Stack: Python 3.12, FastAPI, PostgreSQL. No formatting convention detected yet.'],
+    ['system', '⏱ Tokens burned on environment discovery: 2,184 tokens'],
+    ['system', '❌ No memory of previous sessions. Starting from zero.'],
+  ]},
+
+  // ── Scene 2: Perseus Context (0:30-1:00) ──
+  { delay: 1500, screen: 'main', lines: [
+    ['label', ''],
+    ['label', '── Scene 2: Perseus Pre-Session Context ──'],
+    ['system', 'perseus render --workspace ./my-project'],
+    ['stats', '@services:  FastAPI (port 8000)  │  PostgreSQL (port 5432)'],
+    ['stats', '@stack:     Python 3.12  │  FastAPI 0.115  │  SQLAlchemy 2.0'],
+    ['stats', '@conventions:  black formatting  │  pytest with xdist  │  pre-commit'],
+    ['stats', '@drift:       3 files modified since last session'],
+    ['stats', '@drift:       src/auth.py  ·  src/models.py  ·  tests/test_auth.py'],
+    ['system', '⏱ Context resolved in <span class="highlight">120ms</span> (cold)'],
+    ['system', '[OK] Agent gets pre-resolved context — no discovery tax'],
+    ['stats', 'Tokens saved: <span class="highlight">2,184 → 328</span> (85% reduction)'],
+  ]},
+
+  // ── Scene 3: Mimir Memory (1:00-1:30) ──
+  { delay: 1500, screen: 'main', lines: [
+    ['label', ''],
+    ['label', '── Scene 3: Mimir Cross-Session Memory ──'],
+    ['system', 'Session 1: Agent stores knowledge via Mimir'],
+    ['memory', '<span class="badge store">store</span> Project uses FastAPI with async handlers'],
+    ['memory', '<span class="badge store">store</span> PostgreSQL connection in .env as DATABASE_URL'],
+    ['memory', '<span class="badge store">store</span> Auth middleware uses JWT with 30-min expiry'],
+    ['system', ''],
+    ['system', '── One day later: Session 2 ──'],
+    ['system', 'Agent starts with Perseus context + Mimir recall'],
+    ['memory', '<span class="badge recall">recall</span> How is auth set up?'],
+    ['memory', '  ↳ JWT middleware, 30-min expiry, stored in Session 1 (1d ago)'],
+    ['memory', '<span class="badge recall">recall</span> What database conventions?'],
+    ['memory', '  ↳ PostgreSQL, DATABASE_URL in .env, SQLAlchemy 2.0'],
+    ['system', '[OK] 8 facts recalled across sessions — <span class="highlight">zero hallucinations</span>'],
+    ['system', '⏱ Mimir recall: <span class="highlight">&lt;5ms</span> (SQLite+FTS5, 40+ entities)'],
+  ]},
+
+  // ── Scene 4: Architecture + Benchmarks (1:30-2:10) ──
+  { delay: 1500, screen: 'benchmarks', lines: [
+    ['label', '── Scene 4: Architecture + MI300X Benchmarks ──'],
+    ['stats', 'AMD MI300X (192GB HBM3, ROCm 7) — Full Stack Performance'],
+    ['label', ''],
+    ['label', 'CONTEXT RESOLUTION'],
+    ['stats', '  Cold start:  120ms           Warm cache:  15ms'],
+    ['stats', '  Token savings per session: 2,720 (85% reduction)'],
+    ['label', ''],
+    ['label', 'INFERENCE (vLLM + Qwen3-Coder-FP8)'],
+    ['stats', '  Model:    80B params (3B active MoE)  —  KV cache:  2,065,744 tokens'],
+    ['stats', '  VRAM:     77.3 GB                     —  TTFT:      180-450ms'],
+    ['label', ''],
+    ['label', 'MEMORY (Mimir + SQLite+FTS5)'],
+    ['stats', '  Recall:   <5ms       —  Entities:   40+ per project'],
+    ['stats', '  VRAM:     360MB      —  MCP tools:   23'],
+    ['label', ''],
+    ['label', 'TOTAL STACK EFFICIENCY'],
+    ['stats', '  Context engine:  480MB VRAM  —  LLM inference:  77.3GB VRAM'],
+    ['stats', '  GPU utilization: 12% (context) → 78% peak (inference)'],
+    ['stats', '  Cost per session: <span class="highlight">$0.11</span> (context + inference)'],
+  ]},
+
+  // ── Scene 5: Cost Economics + CTA (2:10-2:35) ──
+  { delay: 1500, screen: 'main', lines: [
+    ['label', ''],
+    ['label', '── Scene 5: Cost Economics + Summary ──'],
+    ['label', ''],
+    ['stats', 'ANNUAL COST COMPARISON:  Cursor SaaS  vs  Perseus on MI300X'],
+    ['stats', '  Solo developer:     $240/yr       $0 (self-hosted)       <span class="highlight">save $240</span>'],
+    ['stats', '  10-developer team:  $4,800/yr     $876/yr                <span class="highlight">save $3,924</span>'],
+    ['stats', '  50-developer team:  $24,000/yr    $4,380/yr              <span class="highlight">save $19,620</span>'],
+    ['stats', '  100-developer team: $48,000/yr    $8,760/yr              <span class="highlight">save $39,240</span>'],
+    ['label', ''],
+    ['stats', 'Break-even on MI300X hardware ($18K): <span class="highlight">4.6 months</span> for a 50-dev team'],
+    ['label', ''],
+    ['agent', ''],
+    ['agent', '[OK] <span class="highlight">Pre-session context</span> — no cold-start discovery tax'],
+    ['agent', '[OK] <span class="highlight">Cross-session memory</span> — 23 MCP tools, &lt;5ms recall'],
+    ['agent', '[OK] <span class="highlight">AMD MI300X optimized</span> — vLLM ROCm 7, FP8 KV cache'],
+    ['agent', '[OK] <span class="highlight">MIT licensed</span> — zero cloud lock-in, zero vendor dependency'],
+    ['agent', ''],
+    ['agent', '<span class="highlight">github.com/tcconnally/perseus-amd-agent</span>'],
+    ['agent', 'AMD Developer Hackathon: Act II  ·  July 2026'],
+  ]},
+];
+
+// ── PLAYBACK ───────────────────────────────────────────────────────
+let sceneIndex = 0;
+let lineIndex = 0;
+let allDone = false;
+
+function addLine(target, type, text) {
+  const div = document.createElement('div');
+  div.className = `line ${type}`;
+  div.innerHTML = text + (type === 'user' ? '<span class="cursor">▌</span>' : '');
+  target.appendChild(div);
+  target.scrollTo({top: target.scrollHeight, behavior: 'smooth'});
+}
+
+function playNextLine() {
+  if (allDone) return;
+  if (sceneIndex >= SCENES.length) { allDone = true; return; }
+
+  const scene = SCENES[sceneIndex];
+
+  if (lineIndex >= scene.lines.length) {
+    sceneIndex++;
+    lineIndex = 0;
+    if (sceneIndex < SCENES.length) {
+      const next = SCENES[sceneIndex];
+      // Show benchmarks terminal when scene 4 starts
+      if (next.screen === 'benchmarks') {
+        benchmarksTerminal.style.display = 'block';
+      } else {
+        benchmarksTerminal.style.display = 'none';
+      }
+      setTimeout(playNextLine, next.delay);
+    } else {
+      allDone = true;
+    }
+    return;
+  }
+
+  const [type, text] = scene.lines[lineIndex];
+  const target = scene.screen === 'benchmarks' ? benchmarksScreen : screen;
+  addLine(target, type, text);
+  lineIndex++;
+
+  let nextDelay = type === 'label' ? 700 :
+                  type === 'system' ? 500 :
+                  type === 'memory' ? 550 :
+                  type === 'agent' ? 900 :
+                  type === 'stats' ? 600 :
+                  type === 'user' ? 700 : 600;
+
+  setTimeout(playNextLine, nextDelay);
+}
+
+setTimeout(playNextLine, 800);
+</script>
+</body>
+</html>
