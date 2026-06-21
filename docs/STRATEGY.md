@@ -101,7 +101,7 @@
 - [ ] Demo video recording (in progress)
 - [ ] Architecture thumbnail re-rendered with published-spec label
 - [ ] Push all changes to GitHub
-- [ ] Register for AMD Developer Program ($100 credits + $50 Fireworks AI)
+- [x] Register for AMD Developer Program ($100 credits + $50 Fireworks AI)
 - [ ] Join lablab Act II team
 - [ ] Upload demo video to YouTube
 - [ ] Submit on LabLab.ai (July 6-11 window)
