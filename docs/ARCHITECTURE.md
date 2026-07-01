@@ -28,13 +28,13 @@ Perseus AMD Agent combines two open-source MIT-licensed projects into a complete
 │  │  1. Perseus renders AGENTS.md preamble                        ││
 │  │  2. Agent reads context (no discovery tax)                    ││
 │  │  3. Agent reasons via vLLM → Qwen3-Coder                      ││
-│  │  4. Agent calls Mimir tools (remember/recall/forget)          ││
-│  │  5. Mimir persists to SQLite+FTS5                             ││
+│  │  4. Agent calls Mneme tools (remember/recall/forget)          ││
+│  │  5. Mneme persists to SQLite+FTS5                             ││
 │  │                                                               ││
 │  └──────────────────────────┬────────────────────────────────────┘│
 │                              │                                     │
 │  ┌──────────────────────────▼────────────────────────────────────┐│
-│  │   Mimir Memory Engine (Rust, CPU-bound)                        ││
+│  │   Mneme Memory Engine (Rust, CPU-bound)                        ││
 │  │                                                               ││
 │  │  • SQLite + FTS5 full-text search                             ││
 │  │  • 23 MCP tools (remember, recall, forget, search, ...)       ││
@@ -57,13 +57,13 @@ Perseus AMD Agent combines two open-source MIT-licensed projects into a complete
 
 ### During Session
 1. Agent reasons via vLLM on MI300X
-2. When agent needs memory: calls Mimir's `recall` MCP tool
-3. Mimir queries SQLite+FTS5, returns structured results
-4. When agent learns something: calls Mimir's `remember` MCP tool
-5. Mimir stores with confidence score, decay parameters
+2. When agent needs memory: calls Mneme's `recall` MCP tool
+3. Mneme queries SQLite+FTS5, returns structured results
+4. When agent learns something: calls Mneme's `remember` MCP tool
+5. Mneme stores with confidence score, decay parameters
 
 ### Between Sessions
-1. Mimir runs `reflect()` pass (nightly or on demand)
+1. Mneme runs `reflect()` pass (nightly or on demand)
 2. Clusters related memories, synthesizes higher-level insights
 3. Decays low-confidence memories
 4. Next session: agent starts with compounded knowledge
@@ -85,7 +85,7 @@ This prevents malicious AGENTS.md files from executing arbitrary commands on the
 - Discovery: services, dependencies, drift detection
 - Web: search, extract
 
-### Mimir (23 tools)
+### Mneme (23 tools)
 - Memory: remember, recall, forget, search
 - Entity management: create, update, delete, list
 - Relationships: link, unlink, find_related
@@ -99,9 +99,9 @@ This prevents malicious AGENTS.md files from executing arbitrary commands on the
 | Component | Cold Start | Warm Cache | Steady State | Source |
 |-----------|-----------|-----------|--------------|--------|
 | Perseus context resolution | 120ms | 15ms | 15ms | CPU-equivalent measured |
-| Mimir recall (100 entities) | 1.8ms | 1.2ms | 1.2ms | SQLite FTS5 published |
-| Mimir recall (1000 entities) | 5.2ms | 3.5ms | 3.5ms | SQLite FTS5 published |
-| Mimir remember (insert) | 2.1ms | 1.5ms | 1.5ms | SQLite published |
+| Mneme recall (100 entities) | 1.8ms | 1.2ms | 1.2ms | SQLite FTS5 published |
+| Mneme recall (1000 entities) | 5.2ms | 3.5ms | 3.5ms | SQLite FTS5 published |
+| Mneme remember (insert) | 2.1ms | 1.5ms | 1.5ms | SQLite published |
 | LLM inference (first token) | — | — | 180-450ms | ROCm 7 published (Qwen3-Coder-FP8) |
 
 ## Hardware Requirements

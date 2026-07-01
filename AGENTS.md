@@ -3,7 +3,7 @@
 - **Name:** Perseus AMD Agent — Complete Agent Context Stack on AMD GPUs
 - **Purpose:** AMD Developer Hackathon: Act II submission (Unicorn Track)
 - **Repo:** github.com/Perseus-Computing-LLC/perseus-amd-agent
-- **Stack:** Python 3.12, Rust (Mimir), vLLM ROCm 7, Qwen3-Coder-FP8
+- **Stack:** Python 3.12, Rust (Mneme), vLLM ROCm 7, Qwen3-Coder-FP8
 - **License:** MIT
 
 ## Architecture

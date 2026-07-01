@@ -26,12 +26,12 @@
 
 ---
 
-## Scene 3: Mimir Cross-Session Memory (1:00-1:45)
+## Scene 3: Mneme Cross-Session Memory (1:00-1:45)
 **Visual:** Three sequential sessions on the same project.
 
 **Narrator:** "But context isn't enough. What about memory? What about the architectural decision we made last Tuesday, or the bug we fixed on Thursday?"
 
-**Action:** Show Session 1 — agent stores 8 facts via Mimir:
+**Action:** Show Session 1 — agent stores 8 facts via Mneme:
 ```
 remember: "Project uses FastAPI with async handlers"
 remember: "PostgreSQL connection string in .env as DATABASE_URL"
@@ -44,14 +44,14 @@ recall: "project architecture" → 8 facts returned
 recall: "auth middleware" → JWT, 30-min expiry, middleware chain
 ```
 
-**Narrator:** "Mimir gives agents persistent memory. 23 MCP tools, <5ms recall, all stored locally in SQLite. Zero cloud dependency."
+**Narrator:** "Mneme gives agents persistent memory. 23 MCP tools, <5ms recall, all stored locally in SQLite. Zero cloud dependency."
 
 ---
 
 ## Scene 4: Architecture + Benchmarks on AMD (1:30-2:10)
 **Visual:** Architecture diagram + benchmark table overlay.
 
-**Narrator:** "Here's the full picture. Perseus handles context, Mimir handles memory, and everything targets AMD MI300X GPUs. These benchmarks are derived from AMD published specifications — ROCm 7 documentation, MI300X datasheet, and Qwen3-Coder model card. Real measurements pending AMD Developer Cloud credits."
+**Narrator:** "Here's the full picture. Perseus handles context, Mneme handles memory, and everything targets AMD MI300X GPUs. These benchmarks are derived from AMD published specifications — ROCm 7 documentation, MI300X datasheet, and Qwen3-Coder model card. Real measurements pending AMD Developer Cloud credits."
 
 **Action:** Show benchmark table with published-spec label:
 
@@ -86,13 +86,13 @@ recall: "auth middleware" → JWT, 30-min expiry, middleware chain
 ## Scene 5: Cost Economics + Call to Action (2:10-2:35)
 **Visual:** GitHub repo + MIT license badge.
 
-**Narrator:** "Perseus and Mimir are both MIT-licensed, open-source, and ready today. Install with pip, target AMD MI300X, and give your agents the context they deserve. Real benchmarks coming as soon as AMD Developer Cloud credits arrive — but the architecture works today."
+**Narrator:** "Perseus and Mneme are both MIT-licensed, open-source, and ready today. Install with pip, target AMD MI300X, and give your agents the context they deserve. Real benchmarks coming as soon as AMD Developer Cloud credits arrive — but the architecture works today."
 
 **Action:** Show install command:
 ```bash
 pip install perseus-ctx
 # Perseus resolves context before your agent sees it
-# Mimir carries memory across sessions
+# Mneme carries memory across sessions
 # Together: the complete agent context stack on AMD
 ```
 
