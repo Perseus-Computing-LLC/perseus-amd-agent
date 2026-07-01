@@ -20,11 +20,11 @@
 
 ---
 
-## Our Entry: Perseus + Mneme on AMD MI300X
+## Our Entry: Perseus + Perseus Vault on AMD MI300X
 
 ### The Pitch
 
-> "AI coding agents lose context every session. Perseus resolves workspace state before the agent sees it. Mneme carries memory across sessions. Both run on AMD MI300X — $0.03/session vs $40/month for SaaS. Demonstrated with benchmarks."
+> "AI coding agents lose context every session. Perseus resolves workspace state before the agent sees it. Perseus Vault carries memory across sessions. Both run on AMD MI300X — $0.03/session vs $40/month for SaaS. Demonstrated with benchmarks."
 
 ### Why This Wins
 
@@ -40,12 +40,12 @@
 **Session 1 (Cold Start):**
 - Agent starts with zero context
 - Perseus resolves: Python 3.12, FastAPI, PostgreSQL, black formatting, pytest convention
-- 8 facts stored in Mneme
+- 8 facts stored in Perseus Vault
 - Token count: 1,200 for context discovery
 
 **Session 2 (Warm Start):**
 - Perseus renders cached context (15ms vs 120ms)
-- Agent recalls Session 1 facts via Mneme
+- Agent recalls Session 1 facts via Perseus Vault
 - 5 facts recalled, 3 new insights generated
 - Token count: 80 for context (94% reduction)
 
@@ -132,4 +132,4 @@ AMD Developer Cloud credits have not arrived (11 days since request). Fireworks 
 - **Hackathon:** https://lablab.ai/ai-hackathons/amd-developer-hackathon-act-ii
 - **AMD Developer Program:** https://www.amd.com/en/developer/ai-dev-program.html
 - **Perseus:** https://github.com/tcconnally/perseus
-- **Mneme:** https://github.com/Perseus-Computing-LLC/mneme
+- **Perseus Vault:** https://github.com/Perseus-Computing-LLC/perseus-vault

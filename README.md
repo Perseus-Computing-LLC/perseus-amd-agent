@@ -2,14 +2,14 @@
 
 **AMD Developer Hackathon: Act II — Unicorn Track**
 
-> "Agents lose memory when sessions end. Perseus + Mneme solve this — on AMD hardware."
+> "Agents lose memory when sessions end. Perseus + Perseus Vault solve this — on AMD hardware."
 
 Perseus AMD Agent combines two open-source MIT-licensed tools into a complete AI agent context stack targeting AMD MI300X GPUs:
 
 | Component | Role | Tech |
 |-----------|------|------|
 | **Perseus** | Pre-session context resolution (services, drift, files) | Python CLI, 22+ MCP tools |
-| **Mneme** | Cross-session persistent memory (recall, remember, insights) | Rust, SQLite+FTS5, 23 MCP tools |
+| **Perseus Vault** | Cross-session persistent memory (recall, remember, insights) | Rust, SQLite+FTS5, 23 MCP tools |
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![Hackathon: AMD Act II](https://img.shields.io/badge/hackathon-AMD%20Act%20II-orange)](https://lablab.ai/ai-hackathons/amd-developer-hackathon-act-ii)
@@ -27,7 +27,7 @@ AI coding agents lose context every session:
 ## The Solution: Resolve-Before-Context + Persistent Memory
 
 1. **Perseus pre-resolves workspace state** before the agent sees it — services, file changes, drift detection, system health. The agent gets a clean, pre-verified context instead of raw tool output.
-2. **Mneme carries memory across sessions** — architectural decisions, bug fixes, conventions, and insights persist. Agents recall what happened last Tuesday.
+2. **Perseus Vault carries memory across sessions** — architectural decisions, bug fixes, conventions, and insights persist. Agents recall what happened last Tuesday.
 
 **Both target AMD MI300X GPUs with zero cloud dependency. Open-source MIT license throughout.**
 
@@ -54,11 +54,11 @@ AI coding agents lose context every session:
     └───────────┬───────────┘
                 │ Agent reasons with full context
                 ▼
-    ┌───────────▼───────────┐
-    │  Mneme (Rust/SQLite)  │  ◄── Persistent memory backend
-    │  remember / recall     │      23 MCP tools
-    │  forget / search       │      <5ms recall, 40+ entities
-    └───────────┬───────────┘
+    ┌───────────▼───────────────┐
+    │  Perseus Vault (Rust/SQLite) │  ◄── Persistent memory backend
+    │  remember / recall           │      23 MCP tools
+    │  forget / search             │      <5ms recall, 40+ entities
+    └───────────┬───────────────┘
                 │ Cross-session memory persists
                 ▼
     ┌───────────────────────┐
@@ -94,7 +94,7 @@ AI coding agents lose context every session:
 The 192GB HBM3 enables running the entire stack — context engine, LLM inference, and memory backend — on a single GPU:
 - **Qwen3-Coder-FP8 (80B params):** ~77 GB VRAM (fits with 115+ GB to spare)
 - **Perseus context engine:** ~120 MB VRAM (CPU-bound, negligible GPU usage)
-- **Mneme memory engine:** ~360 MB VRAM (SQLite+FTS5, CPU-bound)
+- **Perseus Vault memory engine:** ~360 MB VRAM (SQLite+FTS5, CPU-bound)
 - **Remaining VRAM:** >114 GB for KV cache (supports 256K+ token contexts)
 
 ### Projected Performance (Published-Spec Derived)
@@ -104,10 +104,10 @@ The 192GB HBM3 enables running the entire stack — context engine, LLM inferenc
 | **Context resolution latency** | 120ms cold / 15ms warm | Python file I/O + subprocess; measured on equivalent CPU |
 | **Token savings per session** | 2,000+ tokens | Measured: Perseus preamble vs raw environment discovery |
 | **Memory recall latency** | <5ms (SQLite+FTS5) | SQLite FTS5 published benchmarks; confirmed on equivalent hardware |
-| **Memory entities stored** | 40+ per project | Real measurement from Mneme v0.5.0 |
+| **Memory entities stored** | 40+ per project | Real measurement from Perseus Vault v0.5.0 |
 | **Cross-session accuracy** | 100% (zero hallucinations) | Validated in 3-session test on equivalent hardware |
 | **Projected GPU utilization** | ~12% (context) / ~78% (inference peak) | ROCm 7 vLLM published benchmarks |
-| **Projected VRAM (context engine)** | ~480MB | Perseus + Mneme CPU-bound; GPU VRAM reserved for LLM |
+| **Projected VRAM (context engine)** | ~480MB | Perseus + Perseus Vault CPU-bound; GPU VRAM reserved for LLM |
 | **Projected cost/session** | ~$0.11 (context + inference) | AMD cloud spot pricing × projected utilization |
 
 ### What We Would Measure on Real AMD MI300X Hardware
@@ -116,7 +116,7 @@ Once AMD Developer Cloud credits arrive, we would measure:
 
 1. **Context Resolution on MI300X** — Cold/warm cache latency with actual filesystem I/O under ROCm
 2. **vLLM Throughput** — Qwen3-Coder-FP8 token generation rate with ROCm 7 backend, at context lengths from 8K to 256K
-3. **Memory Recall Under Load** — Mneme FTS5 recall with 1K-50K entities while vLLM inference runs concurrently
+3. **Memory Recall Under Load** — Perseus Vault FTS5 recall with 1K-50K entities while vLLM inference runs concurrently
 4. **VRAM Partitioning** — Verify the 480MB context engine + 77GB LLM + KV cache fit within 192GB
 5. **Cost Profile** — Real AMD Developer Cloud instance pricing × measured utilization
 6. **Backend Comparison** — vLLM ROCm vs vLLM CUDA (same model, different GPU) — latency, throughput, cost
@@ -161,8 +161,8 @@ Calculation: 100 sessions/day/dev × 22 days/mo × 0.011 hrs/session (12% GPU ut
 # Install Perseus (Python)
 pip install perseus-ctx
 
-# Install Mneme (Rust binary)
-# Download from: https://github.com/Perseus-Computing-LLC/mneme/releases
+# Install Perseus Vault (Rust binary)
+# Download from: https://github.com/Perseus-Computing-LLC/perseus-vault/releases
 
 # Run a session with context + memory
 perseus render --workspace ./my-project
@@ -209,7 +209,7 @@ From the [AMD Act I hackathon](https://lablab.ai/ai-hackathons/amd-developer-hac
 | **Cost economics** | "$4.12 compute vs $40/seat/month. One MI300X = 70-140 seats." | "$0.11/session vs $40/month. Break-even in 4.6 months." |
 | **Hardware-specific depth** | Found real AITER bug (2.8x faster TTFT but broken output) | Analyzed MI300X 192GB advantage for full-stack agent deployment |
 
-**Dual-backend pattern (from Google Cloud Rapid Agent Hackathon):** Perseus + Mneme with swappable backends — same architecture that won the Elastic Partner Track, now targeting AMD hardware.
+**Dual-backend pattern (from Google Cloud Rapid Agent Hackathon):** Perseus + Perseus Vault with swappable backends — same architecture that won the Elastic Partner Track, now targeting AMD hardware.
 
 ---
 

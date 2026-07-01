@@ -18,7 +18,7 @@ Perseus AMD Agent — Complete AI Agent Context Stack for AMD GPUs
 ## Elevator Pitch (One-Liner)
 
 ```
-AI coding agents lose context every session. Perseus resolves workspace state before the agent sees it. Mneme carries memory across sessions. Both target AMD MI300X — MIT licensed, zero cloud lock-in.
+AI coding agents lose context every session. Perseus resolves workspace state before the agent sees it. Perseus Vault carries memory across sessions. Both target AMD MI300X — MIT licensed, zero cloud lock-in.
 ```
 
 ---
@@ -29,11 +29,11 @@ Perseus AMD Agent gives AI coding agents persistent, compounding memory so they 
 
 1. **Perseus (Context Engine)** — Before every session, auto-discovers services, file changes, project conventions, and drift. The agent gets a clean, pre-verified AGENTS.md preamble instead of raw tool output. 22+ MCP tools. 85% token reduction.
 
-2. **Mneme (Memory Engine)** — Carries architectural decisions, bug fixes, conventions, and insights across sessions. SQLite+FTS5, 23 MCP tools, <5ms recall. Agents remember what happened last Tuesday.
+2. **Perseus Vault (Memory Engine)** — Carries architectural decisions, bug fixes, conventions, and insights across sessions. SQLite+FTS5, 23 MCP tools, <5ms recall. Agents remember what happened last Tuesday.
 
 The demo shows a 3-session progression:
 - **Session 1 (Cold Start):** Agent discovers project from scratch — 2,184 tokens burned
-- **Session 2 (Warm Start):** Perseus + Mneme provide context — 94% token reduction
+- **Session 2 (Warm Start):** Perseus + Perseus Vault provide context — 94% token reduction
 - **Session 3 (Compounding):** 16 facts across sessions, pattern detection, zero hallucinations
 
 Both run on a single AMD MI300X GPU. The 192GB HBM3 fits the full stack — context engine (~480MB), LLM inference (~77GB), KV cache, and memory backend — with 114+ GB to spare.
@@ -47,10 +47,10 @@ Both run on a single AMD MI300X GPU. The 192GB HBM3 fits the full stack — cont
 | Component | Technology | AMD Integration |
 |-----------|-----------|----------------|
 | **Context Engine** | Perseus (Python) | Multi-process CPU/GPU orchestration on ROCm |
-| **Memory Engine** | Mneme (Rust + SQLite+FTS5) | Filesystem on AMD instance storage |
+| **Memory Engine** | Perseus Vault (Rust + SQLite+FTS5) | Filesystem on AMD instance storage |
 | **LLM Inference** | vLLM + Qwen3-Coder-FP8 | ROCm 7 backend, AMD MI300X target |
 | **Model** | Qwen3-Coder-FP8 (80B, MoE) | 3B active params, FP8 KV cache |
-| **MCP Protocol** | Model Context Protocol | 45+ combined tools across Perseus + Mneme |
+| **MCP Protocol** | Model Context Protocol | 45+ combined tools across Perseus + Perseus Vault |
 
 ### Architecture Decision: Why a Unified Context + Memory Stack
 
@@ -128,14 +128,14 @@ The AI coding assistant market is dominated by SaaS with no cross-session memory
 2. **Multi-tenant memory** — Independent memory namespaces per developer on shared MI300X
 3. **Fireworks AI integration** — Route inference to Fireworks AI AMD-hosted models as alternative backend
 4. **Agent analytics dashboard** — Token savings, recall accuracy, knowledge graph visualization
-5. **ROCm container image** — Single Docker image with Perseus + Mneme + vLLM ROCm pre-configured
+5. **ROCm container image** — Single Docker image with Perseus + Perseus Vault + vLLM ROCm pre-configured
 
 ---
 
 ## Built With
 
 - **Perseus** — Python CLI, 22+ MCP tools (MIT)
-- **Mneme** — Rust, SQLite+FTS5, 23 MCP tools (MIT)
+- **Perseus Vault** — Rust, SQLite+FTS5, 23 MCP tools (MIT)
 - **vLLM** — High-throughput LLM serving (Apache 2.0)
 - **Qwen3-Coder-FP8** — 80B MoE coding model (Apache 2.0)
 - **ROCm 7** — AMD open-source GPU computing platform
@@ -150,7 +150,7 @@ The AI coding assistant market is dominated by SaaS with no cross-session memory
 See [demo/demo_script.md](demo/demo_script.md) for the 5-scene, 3-minute video script covering:
 1. The Cold-Start Problem (0:00-0:30)
 2. Perseus Pre-Session Context (0:30-1:00)
-3. Mneme Cross-Session Memory (1:00-1:30)
+3. Perseus Vault Cross-Session Memory (1:00-1:30)
 4. Architecture + Benchmarks (1:30-2:10)
 5. Cost Economics + CTA (2:10-2:35)
 

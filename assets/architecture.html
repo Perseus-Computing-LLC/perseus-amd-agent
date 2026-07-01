@@ -81,11 +81,11 @@
       <line x1="700" y1="395" x2="700" y2="435" stroke="#34d399" stroke-width="2" marker-end="url(#arrow-emerald)"/>
       <text x="710" y="420" font-size="10" fill="#64748b">inference output</text>
 
-      <!-- Agent Pipeline → Mneme -->
+      <!-- Agent Pipeline → Perseus Vault -->
       <line x1="700" y1="565" x2="700" y2="600" stroke="#a78bfa" stroke-width="2" marker-end="url(#arrow-violet)"/>
       <text x="710" y="588" font-size="10" fill="#64748b">remember / recall</text>
 
-      <!-- Mneme → Next Session (curved loop back) -->
+      <!-- Perseus Vault → Next Session (curved loop back) -->
       <path d="M 700 750 L 700 790 L 120 790 L 120 200 L 180 200" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow-violet)"/>
       <text x="150" y="808" font-size="9" fill="#64748b">cross-session memory persists</text>
 
@@ -129,13 +129,13 @@
       <text x="700" y="486" text-anchor="middle" font-size="10" fill="#94a3b8">1. Perseus renders AGENTS.md preamble</text>
       <text x="700" y="502" text-anchor="middle" font-size="10" fill="#94a3b8">2. Agent reads pre-resolved context</text>
       <text x="700" y="518" text-anchor="middle" font-size="10" fill="#94a3b8">3. Agent reasons via vLLM → Qwen3-Coder</text>
-      <text x="700" y="534" text-anchor="middle" font-size="10" fill="#94a3b8">4. Agent calls Mneme tools (remember / recall)</text>
-      <text x="700" y="550" text-anchor="middle" font-size="10" fill="#94a3b8">5. Mneme persists to SQLite+FTS5</text>
+      <text x="700" y="534" text-anchor="middle" font-size="10" fill="#94a3b8">4. Agent calls Perseus Vault tools (remember / recall)</text>
+      <text x="700" y="550" text-anchor="middle" font-size="10" fill="#94a3b8">5. Perseus Vault persists to SQLite+FTS5</text>
 
-      <!-- Mneme (center bottom) -->
+      <!-- Perseus Vault (center bottom) -->
       <rect x="480" y="615" width="440" height="120" rx="8" fill="#0f172a"/>
       <rect x="480" y="615" width="440" height="120" rx="8" fill="rgba(76,29,149,0.4)" stroke="#a78bfa" stroke-width="1.5"/>
-      <text x="700" y="643" text-anchor="middle" font-size="13" fill="#a78bfa" font-weight="700">Mneme — Memory Engine</text>
+      <text x="700" y="643" text-anchor="middle" font-size="13" fill="#a78bfa" font-weight="700">Perseus Vault — Memory Engine</text>
       <text x="700" y="661" text-anchor="middle" font-size="10" fill="#94a3b8">Rust • SQLite+FTS5 • 23 MCP tools</text>
       <text x="700" y="677" text-anchor="middle" font-size="10" fill="#94a3b8">remember • recall • forget • search • reflect</text>
       <text x="700" y="693" text-anchor="middle" font-size="10" fill="#94a3b8">Confidence-scored • Decaying • Compounding insights</text>
@@ -255,7 +255,7 @@
         <h3>Cross-Session Memory</h3>
       </div>
       <ul>
-        <li>Persistent memory via Mneme (Rust)</li>
+        <li>Persistent memory via Perseus Vault (Rust)</li>
         <li>SQLite+FTS5, 23 MCP tools</li>
         <li>Confidence-scored, decaying knowledge</li>
         <li>Zero hallucinations in 3-session test</li>
