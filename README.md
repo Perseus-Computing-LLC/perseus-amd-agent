@@ -14,6 +14,8 @@ Perseus AMD Agent combines two open-source MIT-licensed tools into a complete AI
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![Hackathon: AMD Act II](https://img.shields.io/badge/hackathon-AMD%20Act%20II-orange)](https://lablab.ai/ai-hackathons/amd-developer-hackathon-act-ii)
 
+**🔴 Live demo:** [demo.perseus.observer](https://demo.perseus.observer) — self-contained Perseus Vault semantic-vs-keyword recall demo (zero cloud, bundled ONNX embeddings).
+
 ---
 
 ## The Problem

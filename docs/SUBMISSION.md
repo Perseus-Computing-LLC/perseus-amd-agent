@@ -2,10 +2,13 @@
 
 **Hackathon:** AMD Developer Hackathon: Act II
 **Track:** Unicorn Track 🦄 — No Fixed Benchmark
-**Deadline:** July 11, 2026, 15:00 UTC
+**Deadline:** July 12, 2026, 22:05 UTC (6:05 PM EDT) — per live lablab.ai page
 **Platform:** LabLab.ai (NOT Devpost)
 **GitHub:** https://github.com/Perseus-Computing-LLC/perseus-amd-agent
+**Live Demo:** https://demo.perseus.observer (self-contained Perseus Vault semantic-vs-keyword recall demo)
 **Demo Video:** [YouTube Link — to be added after recording]
+
+**Track 3 required deliverables:** GitHub repo ✅ · Demo video (required) · Slide deck PDF (required) · Live demo URL (optional, recommended). Automated pre-screen inspects repo + slide deck PDF + live URL for AMD resource usage; AMD compute usage is a hard requirement or the entry is disqualified.
 
 ---
 
